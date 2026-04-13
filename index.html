@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Performance Dashboard</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+
+  <!-- Our stylesheet -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ============================================================
+     LOADING OVERLAY — shown until CSV data is ready
+     ============================================================ -->
+<div id="loadingOverlay">
+  <div class="spinner"></div>
+  <p>Loading student data…</p>
+</div>
+
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<header>
+  <div class="header-inner">
+
+    <!-- Brand / Title -->
+    <div class="header-brand">
+      <div class="header-icon">🎓</div>
+      <div>
+        <h1>Student Performance Dashboard</h1>
+        <p>Analyse scores, ranks, and school performance</p>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters">
+
+      <div class="filter-group">
+        <label for="filterCity">City</label>
+        <select id="filterCity">
+          <option value="">All Cities</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="filterStandard">Standard</label>
+        <select id="filterStandard">
+          <option value="">All Standards</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="filterYear">Year</label>
+        <select id="filterYear">
+          <option value="">All Years</option>
+        </select>
+      </div>
+
+      <button class="btn-reset" id="btnReset" title="Reset all filters">
+        ↺ Reset
+      </button>
+
+    </div><!-- /.filters -->
+  </div><!-- /.header-inner -->
+</header>
+
+
+<!-- ============================================================
+     MAIN CONTENT
+     ============================================================ -->
+<main>
+
+  <!-- ── KPI CARDS ────────────────────────────────────────── -->
+  <p class="section-title">Overview</p>
+
+  <div class="kpi-grid">
+
+    <div class="kpi-card blue">
+      <div class="kpi-icon">👩‍🎓</div>
+      <div class="kpi-info">
+        <div class="kpi-label">Total Students</div>
+        <div class="kpi-value" id="kpiStudents">—</div>
+        <div class="kpi-sub">in current selection</div>
+      </div>
+    </div>
+
+    <div class="kpi-card orange">
+      <div class="kpi-icon">📊</div>
+      <div class="kpi-info">
+        <div class="kpi-label">Average Score</div>
+        <div class="kpi-value" id="kpiAvgScore">—</div>
+        <div class="kpi-sub">out of 100</div>
+      </div>
+    </div>
+
+    <div class="kpi-card green">
+      <div class="kpi-icon">🏆</div>
+      <div class="kpi-info">
+        <div class="kpi-label">Top Score</div>
+        <div class="kpi-value" id="kpiTopScore">—</div>
+        <div class="kpi-sub">highest in selection</div>
+      </div>
+    </div>
+
+    <div class="kpi-card purple">
+      <div class="kpi-icon">🏫</div>
+      <div class="kpi-info">
+        <div class="kpi-label">Total Schools</div>
+        <div class="kpi-value" id="kpiSchools">—</div>
+        <div class="kpi-sub">unique schools</div>
+      </div>
+    </div>
+
+  </div><!-- /.kpi-grid -->
+
+
+  <!-- ── CHARTS ───────────────────────────────────────────── -->
+  <p class="section-title">Charts &amp; Analysis</p>
+
+  <div class="charts-grid">
+
+    <!-- Chart 1: Avg Score by City -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">Average Score by City</div>
+          <div class="chart-subtitle">How cities compare overall</div>
+        </div>
+        <span class="chart-badge blue">Bar Chart</span>
+      </div>
+      <div class="chart-container" style="height:260px">
+        <canvas id="chartCity"></canvas>
+      </div>
+    </div>
+
+    <!-- Chart 2: Top 10 Schools -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">Top 10 Schools</div>
+          <div class="chart-subtitle">Ranked by average score</div>
+        </div>
+        <span class="chart-badge purple">Horizontal Bar</span>
+      </div>
+      <div class="chart-container" style="height:260px">
+        <canvas id="chartSchool"></canvas>
+      </div>
+    </div>
+
+    <!-- Chart 3: Rank Distribution -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">Rank Distribution</div>
+          <div class="chart-subtitle">Share of students by rank group</div>
+        </div>
+        <span class="chart-badge orange">Doughnut</span>
+      </div>
+      <div class="chart-container" style="height:260px; display:flex; align-items:center; justify-content:center">
+        <canvas id="chartRank" style="max-height:240px; max-width:340px"></canvas>
+      </div>
+    </div>
+
+    <!-- Chart 4: Standard-wise Avg Score -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">Standard-wise Avg Score</div>
+          <div class="chart-subtitle">Performance across class levels</div>
+        </div>
+        <span class="chart-badge green">Bar Chart</span>
+      </div>
+      <div class="chart-container" style="height:260px">
+        <canvas id="chartStandard"></canvas>
+      </div>
+    </div>
+
+  </div><!-- /.charts-grid -->
+
+
+  <!-- ── DATA TABLE ───────────────────────────────────────── -->
+  <div class="table-card">
+
+    <div class="table-toolbar">
+      <div class="table-toolbar-left">
+        <h2>Student Records</h2>
+        <p id="rowCount">— students</p>
+      </div>
+
+      <!-- Search box -->
+      <div class="search-wrap">
+        <!-- magnifying glass icon (inline SVG, no extra library needed) -->
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input type="text" id="tableSearch" placeholder="Search name, school, city…" />
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table id="dataTable">
+        <thead>
+          <tr>
+            <!-- data-col = key in the data object used for sorting -->
+            <th data-col="School Name">School Name <span class="sort-icon">↕</span></th>
+            <th data-col="School City">City <span class="sort-icon">↕</span></th>
+            <th data-col="Name">Student Name <span class="sort-icon">↕</span></th>
+            <th data-col="Standard">Std <span class="sort-icon">↕</span></th>
+            <th data-col="Score">Score <span class="sort-icon">↕</span></th>
+            <th data-col="Rank">Rank <span class="sort-icon">↕</span></th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <!-- Rows injected by script.js → updateTable() -->
+        </tbody>
+      </table>
+    </div><!-- /.table-wrap -->
+
+  </div><!-- /.table-card -->
+
+</main><!-- /main -->
+
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer>
+  Student Performance Dashboard &nbsp;·&nbsp; Data loaded from <code>data.csv</code> &nbsp;·&nbsp; Built with Chart.js
+</footer>
+
+<!-- Our JS (loaded last so DOM is ready) -->
+<script src="script.js"></script>
+
+</body>
+</html>
